@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "auth-app.serviceName" . | quote }}
+  labels:
+    app: {{ include "auth-app.appName" . | quote }}
+spec:
+  selector:
+    app: {{ include "auth-app.appName" . | quote }}
+  ports:
+    - name: {{ .Values.service.portName }}
+      protocol: TCP
+      port: {{ int .Values.service.port }}
+      targetPort: 8000
+  type: {{ .Values.service.type }}

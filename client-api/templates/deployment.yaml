@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "client-api.appName" . | quote }}
+  labels:
+    app: {{ include "client-api.appName" . | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "client-api.appName" . | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "client-api.appName" . | quote }}
+    spec:
+      containers:
+        - name: {{ include "client-api.appName" . | quote }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+          - name: jwt-keys
+            mountPath: {{ .Values.jwt.mountPath }}
+            readOnly: true
+          env:                    
+          - name: AUTH_HOST
+            value:  {{ .Values.auth_url.host }}
+          - name: AUTH_PATH
+            value: {{ .Values.auth_url.path }}
+          - name: AUTH_LOGIN_ENDPOINT
+            value: {{ .Values.auth_url.login }}  
+          - name: AUTH_REG_ENDPOINT
+            value: {{ .Values.auth_url.register }}   
+          - name: AUTH_PORT
+            value: {{ .Values.auth_url.port | quote }}      
+          - name: JWT_PUBLIC_PATH
+            value: {{ include "client-api.jwtPublicPath" . | quote }}
+          - name: PROFILE_HOST
+            value: {{ .Values.profile_url.host }}
+          - name: PROFILE_PATH
+            value: {{ .Values.profile_url.path }}
+          - name: PROFILE_CREATE_ENDPOINT
+            value:  {{ .Values.profile_url.create }}
+          - name: PROFILE_GET_ENDPOINT
+            value: {{ .Values.profile_url.get }}
+          - name: PROFILE_UPD_ENDPOINT
+            value:  {{ .Values.profile_url.upd }}
+          - name: PROFILE_PORT
+            value:  {{ .Values.profile_url.port | quote}}
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+      - name: jwt-keys
+        secret:
+          secretName: jwt-validation-key

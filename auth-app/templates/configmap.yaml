@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "auth-app.configMapName" . | quote }}
+data:
+  DB_DRIVER_SYNC: {{ .Values.configMap.driver_sync }}
+  DB_DRIVER_ASYNC: {{ .Values.configMap.driver_async }}
+  DB_HOST: {{ include "auth-app.dbhost" . | quote }}
+  DB_PORT: {{ .Values.postgresql.primary.service.port | quote }}

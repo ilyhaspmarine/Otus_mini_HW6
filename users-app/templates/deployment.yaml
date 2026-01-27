@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "users-app.appName" . | quote }}
+  labels:
+    app: {{ include "users-app.appName" . | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "users-app.appName" . | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "users-app.appName" . | quote }}
+    spec:
+      containers:
+        - name: {{ include "users-app.appName" . | quote }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 8000
+          env:
+          - name: DB_DRIVER_ASYNC 
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "users-app.configMapName" . | quote }}
+                key: DB_DRIVER_ASYNC        
+          - name: DB_HOST 
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "users-app.configMapName" . | quote }}
+                key: DB_HOST     
+          - name: DB_PORT 
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "users-app.configMapName" . | quote }}
+                key: DB_PORT                                             
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgresql.auth.existingSecret }} 
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgresql.auth.existingSecret }}  
+                key: password
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgresql.auth.existingSecret }}
+                key: database  
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
