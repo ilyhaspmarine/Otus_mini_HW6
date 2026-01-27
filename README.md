@@ -182,7 +182,7 @@ kubectl delete secret users-db-secret -n profile
 kubectl delete pvc -l app.kubernetes.io/name=auth-postgresql,app.kubernetes.io/instance=<имя_релиза_auth> -n auth
 ```
 ```
-kubectl delete pvc -l app.kubernetes.io/name=users-postgresql,app.kubernetes.io/instance=<имя_релиза_profile>
+kubectl delete pvc -l app.kubernetes.io/name=users-postgresql,app.kubernetes.io/instance=<имя_релиза_profile> -n profile
 ```
 
 #### Сносим PV, оставшиеся от БД (если reclaimPolicy: Retain или что-то сбойнуло)
