@@ -39,7 +39,7 @@ auth_url:
   port: "80"
 
 profile_url:
-  host: "profile-service.default"
+  host: "profile-service.profile"
   path: None
   create: "users"
   get: "users"
