@@ -1,0 +1,825 @@
+{
+  "info": {
+    "_postman_id": "7a7b1f27-35ca-4473-9832-5b100c3ef1c5",
+    "name": "HW6_Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "9701531"
+  },
+  "item": [
+    {
+      "name": "health",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"base_url\", \"arch.homework/client\")"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 201\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(201);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Генерация случайного логина\r",
+              "function generateRandomUsername() {\r",
+              "    const adjectives = [\r",
+              "        'happy', 'sunny', 'clever', 'brave', 'swift', 'wise', \r",
+              "        'cool', 'smart', 'quick', 'lucky', 'funny', 'crazy',\r",
+              "        'epic', 'magic', 'super', 'alpha', 'omega', 'nova'\r",
+              "    ];\r",
+              "    \r",
+              "    const nouns = [\r",
+              "        'user', 'player', 'hero', 'coder', 'dev', 'tester',\r",
+              "        'admin', 'master', 'ninja', 'wizard', 'knight', 'dragon',\r",
+              "        'tiger', 'wolf', 'eagle', 'shark', 'ghost', 'robot'\r",
+              "    ];\r",
+              "    \r",
+              "    const randomNumber = Math.floor(Math.random() * 10000);\r",
+              "    \r",
+              "    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];\r",
+              "    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];\r",
+              "    \r",
+              "    return `${randomAdj}_${randomNoun}_${randomNumber}`;\r",
+              "}\r",
+              "\r",
+              "function generatePhone() {\r",
+              "    const timestamp = Date.now().toString().slice(-7);\r",
+              "    \r",
+              "    return `+7916${timestamp}`;\r",
+              "}\r",
+              "\r",
+              "// Телефон\r",
+              "const phone = generatePhone();\r",
+              "\r",
+              "// Логин\r",
+              "const username = generateRandomUsername();\r",
+              "\r",
+              "// email на основе логина\r",
+              "const email = `${username}@mail.com`;\r",
+              "\r",
+              "// Сохраняем в переменные\r",
+              "pm.collectionVariables.set(\"user1_uname\", username)\r",
+              "pm.collectionVariables.set(\"email\", email)\r",
+              "pm.collectionVariables.set(\"phone\", phone)\r",
+              "\r",
+              "console.log('\\n\\{\\{user1_uname\\}\\} = ', username)\r",
+              "console.log('\\n\\{\\{email\\}\\} = ', email)\r",
+              "console.log('\\n\\{\\{phone\\}\\} = ', phone)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"{{user1_uname}}\",\r\n    \"firstName\": \"Ivan\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"{{phone}}\",\r\n    \"password\": \"qwerty\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get profile no auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 401\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update profile no auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 401\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Генерация случайного логина\r",
+              "function generateRandomUsername() {\r",
+              "    const adjectives = [\r",
+              "        'happy', 'sunny', 'clever', 'brave', 'swift', 'wise', \r",
+              "        'cool', 'smart', 'quick', 'lucky', 'funny', 'crazy',\r",
+              "        'epic', 'magic', 'super', 'alpha', 'omega', 'nova'\r",
+              "    ];\r",
+              "    \r",
+              "    const nouns = [\r",
+              "        'user', 'player', 'hero', 'coder', 'dev', 'tester',\r",
+              "        'admin', 'master', 'ninja', 'wizard', 'knight', 'dragon',\r",
+              "        'tiger', 'wolf', 'eagle', 'shark', 'ghost', 'robot'\r",
+              "    ];\r",
+              "    \r",
+              "    const randomNumber = Math.floor(Math.random() * 10000);\r",
+              "    \r",
+              "    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];\r",
+              "    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];\r",
+              "    \r",
+              "    return `${randomAdj}_${randomNoun}_${randomNumber}`;\r",
+              "}\r",
+              "\r",
+              "// Логин\r",
+              "const username = generateRandomUsername();\r",
+              "\r",
+              "// email на основе логина\r",
+              "const email = `${username}@mail.com`;\r",
+              "\r",
+              "// Сохраняем в переменные\r",
+              "pm.collectionVariables.set(\"email\", email)\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"Ioann2\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"+71111111122\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 200\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "pm.collectionVariables.set(\"access_token\", response.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "{{user1_uname}}",
+              "type": "text",
+              "uuid": "74c93dbc-87b4-4e33-b2d3-0a37419b3957"
+            },
+            {
+              "key": "password",
+              "value": "qwerty",
+              "type": "text",
+              "uuid": "a3588a67-2cb0-48c4-977a-d2481ee32a8d"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 200\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 200\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Email updated\"), () => {\r",
+              "    pm.expect(pm.response.json.email).to.equal(pm.collectionVariables.get(\"email\"))\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// email на основе логина\r",
+              "const email = `updated@mail.com`;\r",
+              "\r",
+              "// Сохраняем в переменные\r",
+              "pm.collectionVariables.set(\"email\", email)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"Ioann4\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"+71111111122\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register user2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 201\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(201);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Генерация случайного логина\r",
+              "function generateRandomUsername() {\r",
+              "    const adjectives = [\r",
+              "        'sad', 'cloudy', 'dumb', 'coward', 'slow', 'stupid', \r",
+              "        'loh', 'crazy', 'lazy', 'fckp', 'sad', 'sane',\r",
+              "        'loosy', 'regular', 'uber', 'beta', 'gamma', 'star'\r",
+              "    ];\r",
+              "    \r",
+              "    const nouns = [\r",
+              "        'user', 'player', 'hero', 'coder', 'dev', 'tester',\r",
+              "        'admin', 'master', 'ninja', 'wizard', 'knight', 'dragon',\r",
+              "        'tiger', 'wolf', 'eagle', 'shark', 'ghost', 'robot'\r",
+              "    ];\r",
+              "    \r",
+              "    const randomNumber = Math.floor(Math.random() * 10000);\r",
+              "    \r",
+              "    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];\r",
+              "    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];\r",
+              "    \r",
+              "    return `${randomAdj}_${randomNoun}_${randomNumber}`;\r",
+              "}\r",
+              "\r",
+              "function generatePhone() {\r",
+              "    const timestamp = Date.now().toString().slice(-7);\r",
+              "    \r",
+              "    return `+7916${timestamp}`;\r",
+              "}\r",
+              "\r",
+              "// Телефон\r",
+              "const phone = generatePhone();\r",
+              "\r",
+              "// Логин\r",
+              "const username = generateRandomUsername();\r",
+              "\r",
+              "// email на основе логина\r",
+              "const email = `${username}@mail.com`;\r",
+              "\r",
+              "// Сохраняем в переменные\r",
+              "pm.collectionVariables.set(\"user2_uname\", username)\r",
+              "pm.collectionVariables.set(\"email\", email)\r",
+              "pm.collectionVariables.set(\"phone\", phone)\r",
+              "\r",
+              "console.log('\\n\\{\\{user2_uname\\}\\} = ', username)\r",
+              "console.log('\\n\\{\\{email\\}\\} = ', email)\r",
+              "console.log('\\n\\{\\{phone\\}\\} = ', phone)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"{{user2_uname}}\",\r\n    \"firstName\": \"Peter\",\r\n    \"lastName\": \"Porker\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"{{phone}}\",\r\n    \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login user2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 200\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "pm.collectionVariables.set(\"access_token\", response.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "{{user2_uname}}",
+              "type": "text",
+              "uuid": "74c93dbc-87b4-4e33-b2d3-0a37419b3957"
+            },
+            {
+              "key": "password",
+              "value": "123456",
+              "type": "text",
+              "uuid": "f0dd3e89-a7f9-41d4-9318-73cc26259867"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get profile user2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 200\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user2_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user2_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get profile user1 from user2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 401\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update profile user1 from user2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status Code is 401\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"Ioann2\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"IvaIva2@mail.com\",\r\n    \"phone\": \"+71111111122\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/{{user1_uname}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "{{user1_uname}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "console.log(\"Request: \\n\", pm.request)"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "console.log(\"\\n-----------------------------\\n\")\r",
+          "\r",
+          "console.log(\"Response:\\n\", pm.response)"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "base_url",
+      "value": ""
+    },
+    {
+      "key": "user1_uname",
+      "value": ""
+    },
+    {
+      "key": "user2_uname",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "phone",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

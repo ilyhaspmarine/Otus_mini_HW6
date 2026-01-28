@@ -148,7 +148,7 @@ curl http://arch.homework/client/health/
 
 #### Запускаем тестовую коллекцию
 ```
-TODO
+newman run ./postman/HW6.json
 ```
 
 ### КАК УДАЛИТЬ
