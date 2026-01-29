@@ -36,10 +36,34 @@
 отображение данных запроса и данных ответа при запуске из командной строки с помощью newman.
 
 ### ПОДГОТОВКА
-Мне надоело писать про etc/hosts и запуск миникуба, поэтому пропустим :)
+#### в /etc/hosts прописываем
+```
+127.0.0.1 arch.homework 
+```
 
-#### NGINX
-Считам, что с прошлой домашки никуда не ушел из кластера
+#### Запускаем docker
+У меня docker desktop с виртуализацией VT-d
+
+#### Запускаем minikube
+```
+minikube start --driver=docker
+```
+
+#### NGINX ingress controller (если его нет в кластере)
+##### Создать namespace под ingress controller
+```
+kubectl create namespace nginx
+```
+##### Установка чарта NGINX
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/
+```
+```
+helm repo update
+```
+```
+helm install nginx ingress-nginx/ingress-nginx --namespace nginx -f ./nginx/nginx_values.yaml
+```
 
 #### Генерируем закрытый и открытый ключи у себя на машине (лучше заранее создать в директории проекта папку ./etc/keys)
 ```
@@ -49,7 +73,7 @@ openssl genrsa -out ./etc/keys/jwt-private.pem 2048
 openssl rsa -in ./etc/keys/jwt-private.pem -pubout -out ./etc/keys/jwt-public.pem
 ```
 
-#### Рождаем в кубике нужные namespace
+#### Создаем в кластере namespace под каждый сервис
 ##### Для сервиса аутентификации
 ```
 kubectl create namespace auth
@@ -62,12 +86,6 @@ kubectl create namespace client
 ```
 kubectl create namespace profile
 ```
-### Схема взаимодействия сервисов (3 ключевых сценария)
-![Схема взаимодействия сервисов - регистрация](./img/reg.png)
-
-![Схема взаимодействия сервисов - аутентификация](./img/auth.png)
-
-![Схема взаимодействия сервисов - изменение профиля](./img/put.png)
 
 ### УСТАНОВКА СЕРВИСОВ
 
@@ -88,7 +106,7 @@ kubectl apply -f ./secrets/auth_secret.yaml -n auth
 ```
 cd ./auth-app
 ```
-###### Качаем зависимости
+###### Загружаем зависимости
 ```
 helm dependency update
 ```
@@ -97,7 +115,7 @@ helm dependency update
 cd ../
 ```
 
-##### Ставимся и ждем, пока установка закончится
+##### Устанавливаем чарт с A&A сервисом
 ```
 helm install <имя_релиза_auth> auth-app -n auth
 ```
@@ -113,7 +131,7 @@ kubectl apply -f ./secrets/users_secret.yaml -n profile
 ```
 cd ./users-app
 ```
-###### Качаем зависимости
+###### Загружаем зависимости
 ```
 helm dependency update
 ```
@@ -122,7 +140,7 @@ helm dependency update
 cd ../
 ```
 
-##### Ставимся и ждем, пока установка закончится
+##### Устанавливаем чарт с Profile сервисом
 ```
 helm install <имя релиза_profile> users-app -n profile
 ```
@@ -135,7 +153,7 @@ helm install <имя релиза_profile> users-app -n profile
 kubectl create secret generic jwt-validation-key --from-file=public.pem=./etc/keys/jwt-public.pem -n client
 ```
 
-##### Ставимся и ждем, пока установка закончится
+##### Устанавливаем чарт API Gateway
 ```
 helm install <имя_релиза_API> client-api -n client
 ```
@@ -156,8 +174,16 @@ curl http://arch.homework/client/health/
 newman run ./postman/HW6.json
 ```
 
+### Схема взаимодействия сервисов (3 ключевых успешных сценария)
+![Схема взаимодействия сервисов - регистрация](./img/reg.png)
+
+![Схема взаимодействия сервисов - аутентификация](./img/auth.png)
+
+![Схема взаимодействия сервисов - изменение профиля](./img/put.png)
+
+
 ### КАК УДАЛИТЬ
-#### Сносим чарты к черту
+#### Удаляем развернутые чарты
 ```
 helm uninstall <имя_релиза_API> -n client
 ```
@@ -168,7 +194,7 @@ helm uninstall <имя_релиза_auth> -n auth
 helm uninstall <имя_релиза_profile> -n profile
 ```
 
-#### Сносим секреты
+#### Удаляем секреты
 ```
 kubectl delete secret jwt-validation-key -n client
 ```
@@ -182,7 +208,7 @@ kubectl delete secret auth-db-secret -n auth
 kubectl delete secret users-db-secret -n profile
 ```
 
-#### Сносим PVC, оставшиеся от БД
+#### Удаляем PVC, оставшиеся от БД (если не хотим сохранить данные в PV)
 ```
 kubectl delete pvc -l app.kubernetes.io/name=auth-postgresql,app.kubernetes.io/instance=<имя_релиза_auth> -n auth
 ```
@@ -190,7 +216,7 @@ kubectl delete pvc -l app.kubernetes.io/name=auth-postgresql,app.kubernetes.io/i
 kubectl delete pvc -l app.kubernetes.io/name=users-postgresql,app.kubernetes.io/instance=<имя_релиза_profile> -n profile
 ```
 
-#### Сносим PV, оставшиеся от БД (если reclaimPolicy: Retain или что-то сбойнуло)
+#### Удаляем PV, оставшиеся от БД (если reclaimPolicy: Retain)
 ```
 kubectl get pv -n <namespace>
 ```
@@ -198,5 +224,8 @@ kubectl get pv -n <namespace>
 ```
 kubectl delete pv <имя PV> -n <namespace>
 ```
+
+#### Удаление NGINX и namespace'ов
+Можно, но не принципиально
 
 ### Готово!

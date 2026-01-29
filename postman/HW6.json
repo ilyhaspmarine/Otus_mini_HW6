@@ -412,10 +412,10 @@
           "script": {
             "exec": [
               "// email на основе логина\r",
-              "const email = `updated@mail.com`;\r",
+              "const email = pm.collectionVariables.get(\"email\");\r",
               "\r",
               "// Сохраняем в переменные\r",
-              "pm.collectionVariables.set(\"email\", email)"
+              "pm.collectionVariables.set(\"email\", \"updated_\"+ email)"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -438,7 +438,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"firstName\": \"Ioann4\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"+71111111122\"\r\n}",
+          "raw": "{\r\n    \"firstName\": \"Ioann4\",\r\n    \"lastName\": \"Ivanov\",\r\n    \"email\": \"{{email}}\",\r\n    \"phone\": \"{{phone}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -668,8 +668,8 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status Code is 401\", () => {\r",
-              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "pm.test(\"Status Code is 403\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(403);\r",
               "});"
             ],
             "type": "text/javascript",
@@ -723,13 +723,20 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status Code is 401\", () => {\r",
-              "    pm.expect(pm.response.code).to.equal(401);\r",
+              "pm.test(\"Status Code is 403\", () => {\r",
+              "    pm.expect(pm.response.code).to.equal(403);\r",
               "});"
             ],
             "type": "text/javascript",
             "packages": {},
             "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "packages": {},
+            "type": "text/javascript"
           }
         }
       ],

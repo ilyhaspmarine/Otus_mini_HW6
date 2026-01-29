@@ -1,0 +1,7 @@
+kubectl create namespace m
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/
+helm repo update
+helm install nginx ingress-nginx/ingress-nginx --namespace m -f nginx_ingress.yaml
+
+    kubectl port-forward --namespace default svc/users-postgresql 5433:5432
+    psql --host 127.0.0.1 -d users_db -p 5433
